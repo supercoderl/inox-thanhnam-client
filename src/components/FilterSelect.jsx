@@ -12,7 +12,7 @@ const options = [
 const customStyles = {
     control: (provided) => ({
         ...provided,
-        backgroundColor: "#0f3460",
+        backgroundColor: "#bd654f",
         color: "white",
         borderRadius: "5px",
         border: "none",
@@ -25,8 +25,8 @@ const customStyles = {
         backgroundColor: state.isSelected ? "#0f3460" : "white",
         color: state.isSelected ? "white" : "#0f3460",
         "&:hover": {
-        backgroundColor: "#0f3460",
-        color: "white",
+            backgroundColor: "#0f3460",
+            color: "white",
         },
     }),
     singleValue: (provided) => ({
@@ -35,17 +35,17 @@ const customStyles = {
     }),
 };
 
-const FilterSelect = ({setFilterList}) => {
-    const handleChange = (selectedOption)=> {
-        setFilterList(products.filter(item => item.category ===selectedOption.value))
+const FilterSelect = ({ setFilterList }) => {
+    const handleChange = (selectedOption) => {
+        setFilterList(products.filter(item => item.category === selectedOption.value))
     }
     return (
-    <Select
-    options={options}
-    defaultValue={{ value: "", label: "Filter By Category" }}
-    styles={customStyles}
-    onChange={handleChange}
-    />
+        <Select
+            options={options}
+            defaultValue={{ value: "", label: "Lọc sản phẩm" }}
+            styles={customStyles}
+            onChange={handleChange}
+        />
     );
 };
 

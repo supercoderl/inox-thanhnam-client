@@ -4,15 +4,15 @@ import ProductCard from "./ProductCard/ProductCard";
 
 const ShopList = ({ productItems }) => {
   useEffect(() => {}, [productItems]);
-  if (productItems.length === 0) {
-    return <h1 className="not-found">Product Not Found !!</h1>;
+  if (productItems && productItems.length === 0) {
+    return <h1 className="not-found">Không có sản phẩm nào !!</h1>;
   }
   return (
     <Row className="justify-content-center">
       {productItems.map((productItem) => {
         return (
           <ProductCard
-            key={productItem.id}
+            key={productItem.productID}
             title={null}
             productItem={productItem}
           />

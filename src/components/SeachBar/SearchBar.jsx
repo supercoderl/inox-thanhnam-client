@@ -9,13 +9,13 @@ const SearchBar = ({ setFilterList }) => {
     setSearchWord(input.target.value);
     setFilterList(
       products.filter((item) =>
-        item.productName?.toLowerCase().includes(searchWord?.toLowerCase())
+        item.name?.toLowerCase().includes(searchWord?.toLowerCase())
       )
     );
   };
   return (
     <div className="search-container">
-      <input type="text" placeholder="Search..." onChange={handelChange} />
+      <input type="text" placeholder="Tìm kiếm sản phẩm..." onChange={handelChange} />
       <ion-icon name="search-outline" className="search-icon"></ion-icon>
     </div>
   );

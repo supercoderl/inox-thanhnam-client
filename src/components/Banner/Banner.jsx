@@ -1,10 +1,10 @@
 import { Col, Container, Row } from "react-bootstrap";
-import productBg from "../../Images/table.jpg";
+import productBg from "../../assets/images/background/product-background.jpg";
 import "./banner.css";
 const Banner = ({title}) => {
     return ( 
         <div className="image-container">
-            <img src={productBg} alt="Product-bg" />
+            <img src={productBg} alt="Product-bg" style={{ objectFit: "cover" }}/>
             <div className="overlay">
                 <Container>
                     <Row>

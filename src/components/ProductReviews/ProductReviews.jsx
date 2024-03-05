@@ -4,6 +4,7 @@ import "./product-review.css";
 
 const ProductReviews = ({ selectedProduct }) => {
   const [listSelected, setListSelected] = useState("desc");
+
   return (
     <section className="product-reviews">
       <Container>
@@ -12,13 +13,13 @@ const ProductReviews = ({ selectedProduct }) => {
             style={{ color: listSelected === "desc" ? "black" : "#9c9b9b" }}
             onClick={() => setListSelected("desc")}
           >
-            Description
+            Mô tả
           </li>
           <li
             style={{ color: listSelected === "rev" ? "black" : "#9c9b9b" }}
             onClick={() => setListSelected("rev")}
           >
-            Reviews ({selectedProduct?.reviews.length})
+            Đánh giá ({3})
           </li>
         </ul>
         {listSelected === "desc" ? (

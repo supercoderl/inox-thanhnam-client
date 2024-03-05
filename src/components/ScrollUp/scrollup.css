@@ -1,0 +1,26 @@
+.scroll-top {
+    height: 40px;
+    width: 40px;
+    background-color: white;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.336);
+    transform: scale(0.9);
+    transition: 0.3s ease-in-out transform;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scroll-top svg {
+    width: 60%;
+    color: black;
+    pointer-events: none;
+}
+
+.scroll-top:hover {
+    transform: scale(1);
+}

@@ -3,6 +3,11 @@
     height: 200px !important;
     object-fit: contain;
     cursor: pointer;
+    transition: all 0.5s ease;
+}
+
+.product img:hover {
+    transform: scale(1.1);
 }
 
 .discount {
@@ -15,11 +20,12 @@
     border-radius: 50px;
     color: #fff;
     margin: 10px;
+    z-index: 3;
 }
 
 .product {
     background: #fff;
-    padding: 20px;
+    padding: 10px;
     position: relative;
     border-radius: 8px;
     box-shadow: rgb(3 0 71 / 9%) 0px 1px 3px;
@@ -27,6 +33,7 @@
 }
 
 .product h3 {
+    height: 40px;
     margin: 10px 0;
     font-weight: 500;
     font-size: 17px;

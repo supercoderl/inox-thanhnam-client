@@ -63,27 +63,27 @@ export const SliderData = [
 export const serviceData = [
   {
     icon: <ion-icon name="car"></ion-icon>,
-    title: "Free Shipping",
-    subtitle: "Lorem ipsum dolor sit amet.",
-    bg: "#fdefe6",
+    title: "Giao hàng",
+    subtitle: "Nhanh chóng, toàn quốc, uy tín.",
+    bg: "#e8bad3",
   },
   {
     icon: <ion-icon name="card"></ion-icon>,
-    title: "Safe Payment",
-    subtitle: "Lorem ipsum dolor sit amet.",
-    bg: "#ceebe9",
+    title: "Thanh toán",
+    subtitle: "Tiết kiệm, giá cả phải chăng.",
+    bg: "#cad6b6",
   },
   {
     icon: <ion-icon name="shield-half-outline"></ion-icon>,
-    title: "Secure Payment",
-    subtitle: "Lorem ipsum dolor sit amet.",
-    bg: "#e2f2b2",
+    title: "Chất lượng",
+    subtitle: "An toàn, đảm bảo chất lượng.",
+    bg: "#c3ed7b",
   },
   {
     icon: <ion-icon name="headset"></ion-icon>,
-    title: " Back Guarantee",
-    subtitle: "Lorem ipsum dolor sit amet.",
-    bg: "#d6e5fb",
+    title: "Chăm sóc khách hàng",
+    subtitle: "Tận tâm, chu đáo.",
+    bg: "#ed9d72",
   },
 ];
 
