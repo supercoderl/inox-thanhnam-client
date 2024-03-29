@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../..";
 
 const ProductCard = ({ title, productItem }) => {
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState("https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg");
   const [loading, setLoading] = useState(false);
   const orderID = localStorage.getItem("OrderID");
   const { state } = useAuth();
@@ -23,9 +23,25 @@ const ProductCard = ({ title, productItem }) => {
       toast.warning("Bạn phải đăng nhập để tiếp tục.");
       return;
     }
+    else if (!orderID) {
+      await getCart().then(async (response) => {
+        const result = response.data;
+        console.log(result);
+        if (!result) return;
+        else if (result.success) {
+          localStorage.setItem("OrderID", result.data.orderID);
+          await add(result.data.orderID);
+        }
+        else toast.error(result.message);
+      }).catch((error) => console.log(error));
+    }
+    else await add(orderID);
+  };
+
+  const add = async (ordID) => {
     setLoading(true);
     const body = {
-      orderID,
+      orderID: ordID,
       productID: productItem.productID,
       quantity: 1
     };
@@ -34,13 +50,19 @@ const ProductCard = ({ title, productItem }) => {
       if (res.data.success) toast.success(res.data.message);
       else toast.error(res.data.message);
     }).catch((error) => console.log(error)).finally(() => setLoading(false));
-  };
+  }
+
+  const getCart = async () => {
+    setLoading(true);
+    if (!state.isAuthenticated) return;
+    else {
+      return await ApiService.get("Order/get-order-by-user");
+    }
+  }
 
   const getImages = async () => {
     await ApiService.get(`ProductImage/images/${productItem?.productID}`).then((res) => {
-      console.log(res);
-      if (res.data.success) setImage(res.data.data[0]?.imageURL);
-      else toast.error(res.data.message);
+      if (res.data.success && res.data.data) setImage(res.data.data[0]?.imageURL);
     }).catch((error) => {
       console.log(error);
     });

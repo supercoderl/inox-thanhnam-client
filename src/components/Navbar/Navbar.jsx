@@ -30,7 +30,6 @@ const NavBar = () => {
     // }).catch((error) => console.log(error));
     localStorage.clear();
     logout();
-    window.location.reload();
   }
 
   return (

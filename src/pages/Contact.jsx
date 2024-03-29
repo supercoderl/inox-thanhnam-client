@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import Spinner from "../components/Spinner/Spinner";
 import useWindowScrollToTop from "../hooks/useWindowScrollToTop";
 
-const Contact = () => {
+const Contact = ({ connection }) => {
     const user = JSON.parse(AuthService.getUser());
     const [information, setInformation] = useState({
         fullname: user?.fullname || "",
@@ -29,14 +29,17 @@ const Contact = () => {
             status: "new"
         }
 
-        await ApiService.post("Contact/create-contact", body, null).then((res) => {
-            if (res.data.success) {
-                toast.success(res.data.message);
+        await ApiService.post("Contact/create-contact", body, null).then(async (response) => {
+            const result = response.data;
+            if(!result) return;
+            if (result.success && result.data) {
+                toast.success(result.message);
+                await connection.invoke("SendNotify", `Bạn có tin nhắn mới từ ${result.data?.fullname}`, "contact", result.data?.contactID);
                 setTimeout(() => {
                     window.location.reload();
                 }, 1200);
             }
-            else toast.error(res.data.message);
+            else toast.error(result.message);
         }).catch((error) => console.log(error)).finally(() => { 
             setLoading(false);
         });
@@ -59,7 +62,7 @@ const Contact = () => {
                             </div>
                         </div>
                         <div className="col-lg-6">
-                            <div className="contact-box ml-3">
+                            <div className="contact-box ml-3 px-3">
                                 <h1 className="font-weight-light mt-2">Liên hệ với chúng tôi</h1>
                                 <form className="mt-4" onSubmit={handleSend}>
                                     <div className="row">

@@ -138,11 +138,11 @@ button {
   object-fit: contain;
 }
 
-@media (max-width: 767px) {
+/* @media (max-width: 767px) {
   .cart-items .container>.row {
     flex-wrap: wrap-reverse !important;
   }
-}
+} */
 
 .cart-items .cart-content {
   align-items: flex-end;
@@ -343,7 +343,8 @@ button.delete ion-icon {
   align-items: center;
   width: 100%;
   height: 100vh;
-  background: #ccc;
+  background: url("https://wallpapers.com/images/hd/dark-theme-background-0rpr12gxz1cubb05.jpg");
+  background-position: center;
   background-size: cover;
 }
 
@@ -657,4 +658,16 @@ button.delete ion-icon {
 
 .form-control:focus {
   box-shadow: none !important;
+}
+
+.loading {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

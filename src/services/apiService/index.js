@@ -38,6 +38,13 @@ const ApiService = {
     },
     formatVND: (amount) => {
         return amount ? amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : 0;
+    },
+    splitFullname: (fullname) => {
+        if(!fullname || fullname === "") return null;
+        const splitName = fullname.split(' ');
+        const firstname = splitName.pop();
+        const lastname = splitName.join(' ');
+        return { firstname, lastname };
     }
 };
 

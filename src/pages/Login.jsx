@@ -5,6 +5,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner/Spinner";
 import ApiService from "../services/apiService";
 import { useAuth } from "..";
+import { v4 as uuid } from 'uuid';
+import axiosInstance from "../config/axios";
+import Loading from "../components/Loading";
+import "./css/Login.css";
 
 function Login() {
     const [state, setState] = useState("bounceRight");
@@ -18,6 +22,12 @@ function Login() {
         password: null
     });
 
+    const [registerRequest, setRegisterRequest] = useState({
+        username: null,
+        fullname: null,
+        phone: null
+    });
+
     const registerClick = () => {
         setState("bounceLeft");
     }
@@ -29,40 +39,51 @@ function Login() {
     const submit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        await AuthService.login(loginRequest.username, loginRequest.password).then((res) => {
-            console.log(res);
+        await AuthService.login(loginRequest.username, loginRequest.password).then(async (res) => {
             if (res.data.success) {
                 toast.success(res.data.message);
                 AuthService.saveAccessToken(res.data.data?.token?.accessToken);
                 AuthService.saveRefreshToken(res.data.data?.refreshToken?.refreshToken);
                 AuthService.saveUser(JSON.stringify(res.data.data?.userResult));
                 login(JSON.stringify(res.data.data?.userResult));
-                localStorage.setItem("authState", JSON.stringify({ isAuthenticated: true, payload: JSON.stringify(res.data.data?.userResult)}));
-                getCart();
+                localStorage.setItem("authState", JSON.stringify({ isAuthenticated: true, payload: JSON.stringify(res.data.data?.userResult) }));
+                await checkOrder();
                 navigate("/");
             }
             else toast.error(res.data.message);
         }).catch((error) => {
             console.log(error);
-        }).finally(() => setLoading(false));
+        }).finally(() => setTimeout(() => setLoading(false), 2000));
     }
 
-    const getCart = async () => {
-        await ApiService.get("Order/get-order-by-user").then(async (res) => {
-            console.log(res);
-            if (!res.data.success) {
-                const body = {
-                    orderDate: new Date(),
-                    totalAmount: 0,
-                }
-                const result = await ApiService.post("Order/create-order", body, null);
-                localStorage.setItem("OrderID", result.data.data?.orderID);
-                toast.success(result.data.message);
+    const submitRegister = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        const body = {
+            userID: uuid(),
+            username: registerRequest.username,
+            password: registerRequest.password,
+            firstname: ApiService.splitFullname(registerRequest.fullname)?.firstname || "",
+            lastname: ApiService.splitFullname(registerRequest.fullname)?.lastname || "",
+            phone: typeof registerRequest.phone === "number" ? registerRequest.phone : "0912345678"
+        };
+        await axiosInstance.post("Auth/register", body).then(async (response) => {
+            const result = response.data;
+            if (!result) return;
+            else if (result.success) {
+                toast.success(result.message);
+                await submit(e);
             }
-            else {
-                localStorage.setItem("OrderID", res.data.data?.orderID);
-            }
-        }).catch((error) => console.log(error));
+            else toast.error(result.message);
+        }).catch((error) => console.log("Register: ", error)).finally(() => setTimeout(() => setLoading(false), 2000));
+    }
+
+    const checkOrder = async () => {
+        await axiosInstance.get("Order/get-order-by-user").then((response) => {
+            const result = response.data;
+            if (!result) return;
+            else if (result.success) localStorage.setItem("OrderID", result.data?.orderID);
+        }).catch((error) => console.log("Get order: ", error));
     }
 
     useEffect(() => {
@@ -72,76 +93,136 @@ function Login() {
 
     return (
         <section className="user">
-            <div className="user_options-container">
-                <div className="user_options-text">
-                    <div className="user_options-unregistered">
-                        <h2 className="user_unregistered-title">Chưa có tài khoản?</h2>
-                        <p className="user_unregistered-text">Tạo ngay tài khoản mới để mua hàng inox của chúng tôi.</p>
-                        <button className="user_unregistered-signup" id="signup-button" onClick={registerClick}>Đăng ký</button>
-                    </div>
-
-                    <div className="user_options-registered">
-                        <h2 className="user_registered-title">Bạn đã có tài khoản?</h2>
-                        <p className="user_registered-text">Tham gia ngay để nhận thêm các ưu đãi mới nhất.</p>
-                        <button className="user_registered-login" id="login-button" onClick={loginClick}>Đăng nhập</button>
-                    </div>
-                </div>
-
-                <div className={`user_options-forms ${state}`} id="user_options-forms">
-                    <div className="user_forms-login">
-                        <h2 className="forms_title">Đăng nhập</h2>
-                        <form className="forms_form" onSubmit={submit}>
-                            <fieldset className="forms_fieldset">
-                                <div className="forms_field">
-                                    <input
-                                        type="text"
-                                        placeholder="Tên đăng nhập"
-                                        className="forms_field-input"
-                                        required
-                                        autoFocus
-                                        onChange={(e) => setLoginRequest({ ...loginRequest, username: e.target.value })}
-                                    />
-                                </div>
-                                <div className="forms_field">
-                                    <input
-                                        type="password"
-                                        placeholder="Mật khẩu"
-                                        className="forms_field-input"
-                                        required
-                                        onChange={(e) => setLoginRequest({ ...loginRequest, password: e.target.value })}
-                                    />
-                                </div>
+            {
+                loading && <Loading />
+            }
+            <div className="section">
+                <div className="container">
+                    <div className="row full-height justify-content-center">
+                        <div className="col-12 text-center align-self-center">
+                            <div className="section pb-5 pt-5 pt-sm-2 text-center">
+                                <h6 className="mb-0 pb-3"><span className="text-white">Đăng nhập </span><span className="text-white">Đăng ký</span></h6>
                                 {
-                                    loading ?
-                                        <div><Spinner /> Đang đăng nhập...</div>
+                                    state === "bounceRight" ?
+                                        <button onClick={registerClick}>
+                                            <box-icon name='toggle-left' type="solid" color='#ffffff' size="lg"></box-icon>
+                                        </button>
                                         :
-                                        null
+                                        <button onClick={loginClick}>
+                                            <box-icon name='toggle-right' type="solid" color='#ffffff' size="lg"></box-icon>
+                                        </button>
                                 }
-                            </fieldset>
-                            <div className="forms_buttons">
-                                <button type="button" className="forms_buttons-forgot">Quên mật khẩu?</button>
-                                <input type="submit" value="Đăng nhập" className="forms_buttons-action" />
+                                <div className={`card-3d-wrap mx-auto ${state}`}>
+                                    <div className="card-3d-wrapper">
+                                        <div className="card-front">
+                                            <div className="center-wrap">
+                                                <div className="section text-center">
+                                                    <h4 className="mb-4 pb-3 text-white">Đăng nhập</h4>
+                                                    <form action="post" onSubmit={submit}>
+                                                        <div className="form-group">
+                                                            <input
+                                                                type="text"
+                                                                name="logemail"
+                                                                className="form-style"
+                                                                placeholder="Tên đăng nhập"
+                                                                id="logemail"
+                                                                autoComplete="off"
+                                                                required
+                                                                onChange={(e) => setLoginRequest({ ...loginRequest, username: e.target.value })}
+                                                            />
+                                                            <box-icon name='user' animation='flashing' color='#ffffff' ></box-icon>
+                                                        </div>
+                                                        <div className="form-group mt-2">
+                                                            <input
+                                                                type="password"
+                                                                name="logpass"
+                                                                className="form-style"
+                                                                placeholder="Mật khẩu"
+                                                                id="logpass"
+                                                                autoComplete="off"
+                                                                required
+                                                                onChange={(e) => setLoginRequest({ ...loginRequest, password: e.target.value })}
+                                                            />
+                                                            <box-icon name='lock-alt' animation='flashing' color='#ffffff' ></box-icon>
+                                                        </div>
+                                                        <input type="submit" className="btn mt-4" value="Đăng nhập" />
+                                                    </form>
+                                                    <p className="mb-0 mt-4 text-center"><a href="#0" className="link">Quên mật khẩu?</a></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="card-back">
+                                            <div className="center-wrap">
+                                                <div className="section text-center">
+                                                    <h4 className="mb-4 pb-3 text-white">Đăng ký</h4>
+                                                    <form action="post" onSubmit={submitRegister}>
+                                                        <div className="form-group">
+                                                            <input
+                                                                type="text"
+                                                                name="logname"
+                                                                className="form-style"
+                                                                placeholder="Họ và tên"
+                                                                id="logname"
+                                                                autoComplete="off"
+                                                                required
+                                                                onChange={(e) => setRegisterRequest({ ...registerRequest, fullname: e.target.value })}
+                                                            />
+                                                            <box-icon name='lira' animation='flashing' color='#ffffff' ></box-icon>
+                                                        </div>
+                                                        <div className="form-group mt-2">
+                                                            <input
+                                                                type="text"
+                                                                name="logemail"
+                                                                className="form-style"
+                                                                placeholder="Tên đăng nhập"
+                                                                id="logemail"
+                                                                autoComplete="off"
+                                                                required
+                                                                onChange={(e) => {
+                                                                    setRegisterRequest({ ...registerRequest, username: e.target.value });
+                                                                    setLoginRequest({ ...loginRequest, username: e.target.value })
+                                                                }}
+                                                            />
+                                                            <box-icon name='user' animation='flashing' color='#ffffff' ></box-icon>
+                                                        </div>
+                                                        <div className="form-group mt-2">
+                                                            <input
+                                                                type="password"
+                                                                name="logpass"
+                                                                className="form-style"
+                                                                placeholder="Mật khẩu"
+                                                                id="logpass"
+                                                                autoComplete="off"
+                                                                required
+                                                                onChange={(e) => {
+                                                                    setRegisterRequest({ ...registerRequest, password: e.target.value });
+                                                                    setLoginRequest({ ...loginRequest, password: e.target.value })
+                                                                }}
+                                                            />
+                                                            <box-icon name='lock-alt' animation='flashing' color='#ffffff' ></box-icon>
+                                                        </div>
+                                                        <div className="form-group mt-2">
+                                                            <input
+                                                                type="text"
+                                                                name="logphone"
+                                                                className="form-style"
+                                                                placeholder="Số điện thoại"
+                                                                id="logphone"
+                                                                autoComplete="off"
+                                                                required
+                                                                onChange={(e) => setRegisterRequest({ ...registerRequest, phone: e.target.value })}
+                                                            />
+                                                            <box-icon name='phone' animation='flashing' color='#ffffff' ></box-icon>
+                                                        </div>
+                                                        <input type="submit" className="btn mt-4" value="Đăng ký" />
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </form>
-                    </div>
-                    <div className="user_forms-signup">
-                        <h2 className="forms_title">Đăng ký</h2>
-                        <form className="forms_form">
-                            <fieldset className="forms_fieldset">
-                                <div className="forms_field">
-                                    <input type="text" placeholder="Họ và tên" className="forms_field-input" required />
-                                </div>
-                                <div className="forms_field">
-                                    <input type="text" placeholder="Tên đăng nhập" className="forms_field-input" required />
-                                </div>
-                                <div className="forms_field">
-                                    <input type="password" placeholder="Mật khẩu" className="forms_field-input" required />
-                                </div>
-                            </fieldset>
-                            <div className="forms_buttons">
-                                <input type="submit" value="Đăng ký" className="forms_buttons-action" />
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -37,19 +37,19 @@ const Home = () => {
         title="On sale tháng 2"
         image={require("../assets/images/icon/sale.gif")}
         bgColor="#f6f9fc"
-        productItems={products}
+        productItems={products.length > 0 ? products.filter(x => x.discountID).slice(0, 5) : products}
       />
       <Section
         title="Mới nhất"
         image="https://cdn-icons-gif.flaticon.com/12708/12708326.gif"
         bgColor="white"
-        productItems={products}
+        productItems={products.length > 0 ? products.slice(0, 5) : products}
       />
       <Section
         title="Thương hiệu Thành Nam"
         image={require("../assets/images/icon/trademark.gif")}
         bgColor="#f6f9fc"
-        productItems={products}
+        productItems={products.length > 0 ? products.slice(0, 5) : products}
       />
     </Fragment>
   );

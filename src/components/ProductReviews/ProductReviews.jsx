@@ -24,7 +24,8 @@ const ProductReviews = ({ selectedProduct }) => {
         </ul>
         {listSelected === "desc" ? (
           <p>{selectedProduct?.description}</p>
-        ) : (
+        ) : null}
+        {/* (
           <div className="rates">
             {selectedProduct?.reviews.map((rate) => (
               <div className="rate-comment" key={rate.rating}>
@@ -34,7 +35,7 @@ const ProductReviews = ({ selectedProduct }) => {
               </div>
             ))}
           </div>
-        )}
+        ) */}
       </Container>
     </section>
   );

@@ -6,8 +6,9 @@ import { useAuth } from "..";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../services/authService";
 import LoginRequire from "../components/Error/loginRequire";
+import axiosInstance from "../config/axios";
 
-const Cart = () => {
+const Cart = ({ connection }) => {
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState(null);
   const [orderItems, setOrderItems] = useState([]);
@@ -30,7 +31,6 @@ const Cart = () => {
           setOrder(res.data.data);
           getCartItems(res.data.data?.orderID);
         }
-        else toast.error(res.data.message);
       }).catch((error) => {
         console.log(error);
       }).finally(() => setLoading(false));
@@ -75,28 +75,9 @@ const Cart = () => {
 
     orderItem.quantity = quantity;
 
-    await ApiService.put(`Order/update-order-item/${orderItem.orderItemID}`, orderItem, null).then((res) => {
-      if (res.data.success) updateTotalAmount(res.data.data?.orderID);
-      else toast.error(res.data.message);
-    }).catch((error) => console.log(error));
-  }
-
-  const updateTotalAmount = async (orderID) => {
-    let total = 0;
-    orderItems.forEach((orderItem) => {
-      total += orderItem.quantity * productDetails.find(x => x.productID === orderItem.productID)?.price;
-    });
-
-    const body = {
-      orderID: orderID,
-      orderDate: new Date(),
-      totalAmount: total
-    };
-
-    await ApiService.put(`Order/update-order/${orderID}`, body, null).then((res) => {
+    await ApiService.post(`Order/create-order-item`, orderItem, null).then((res) => {
+      console.log(res);
       if (res.data.success) {
-        toast.success(res.data.message);
-        navigate('', { replace: true });
         getCart();
       }
       else toast.error(res.data.message);
@@ -107,21 +88,45 @@ const Cart = () => {
     await ApiService.delete(`Order/delete-order-item/${orderItem?.orderItemID}`).then((res) => {
       if (res.data.success) {
         setProductDetails(productDetails.filter(x => x.productID !== orderItem?.productID));
-        toast.success(res.data.message);
-        updateTotalAmount(orderItem?.orderID);
+        // toast.success(res.data.message);
         getCartItems(localStorage.getItem("OrderID"));
+        getCart();
       }
       else toast.error(res.data.message);
     }).catch((error) => console.log(error));
   }
 
-  const handleCheckout = (e) => {
+  const handleCheckout = async (e) => {
     e.preventDefault();
     if (!state.isAuthenticated) {
       toast.warning("Bạn phải đăng nhập để tiếp tục.");
       return;
     }
-    console.log(information);
+    const body = {
+      orderID: order.orderID,
+      userID: order.userID,
+      orderDate: new Date(),
+      totalAmount: order.totalAmount,
+      status: 1,
+      fullname: information.fullname,
+      phone: information.phone,
+      address: information.address
+    };
+    await axiosInstance.put(`Order/update-order/${order.orderID}`, body, null).then(async (response) => {
+      const result = response.data;
+      if (!result) return;
+      else if (result.success) {
+        toast.success("Đặt hàng thành công.");
+        getCart();
+        setInformation({});
+        localStorage.removeItem("OrderID");
+        await connection.invoke("SendNotify", `Bạn có đơn hàng mới! Mã đơn hàng ${result.data?.orderID}`, "order", result.data?.orderID);
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+      else toast.error(result.message);
+    }).catch((error) => console.log(error));
   }
 
   useEffect(() => {
@@ -153,7 +158,7 @@ const Cart = () => {
                   <div className="cart-list" key={item.productID}>
                     <Row>
                       <Col className="image-holder" sm={4} md={3}>
-                        <img src={item.imgUrl} alt="" />
+                        <img src={item.imgUrl || "https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg"} alt="" />
                       </Col>
                       <Col sm={8} md={9}>
                         <Row className="cart-content justify-content-center">

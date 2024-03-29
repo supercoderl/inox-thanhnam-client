@@ -12,7 +12,7 @@ const ProductDetails = ({ selectedProduct }) => {
   const [scrollEnd, setScrollEnd] = useState(false);
 
   const [images, setImages] = useState([]);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState("https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg");
   const [loading, setLoading] = useState(false);
   const orderID = localStorage.getItem("OrderID");
   const { state } = useAuth();
@@ -22,9 +22,25 @@ const ProductDetails = ({ selectedProduct }) => {
       toast.warning("Bạn phải đăng nhập để tiếp tục.");
       return;
     }
+    else if (!orderID) {
+      await getCart().then(async (response) => {
+        const result = response.data;
+        console.log(result);
+        if (!result) return;
+        else if (result.success) {
+          localStorage.setItem("OrderID", result.data.orderID);
+          await add(result.data.orderID);
+        }
+        else toast.error(result.message);
+      }).catch((error) => console.log(error));
+    }
+    else await add(orderID);
+  };
+
+  const add = async (ordID) => {
     setLoading(true);
     const body = {
-      orderID,
+      orderID: ordID,
       productID: selectedProduct?.productID,
       quantity: 1
     };
@@ -33,15 +49,22 @@ const ProductDetails = ({ selectedProduct }) => {
       if (res.data.success) toast.success(res.data.message);
       else toast.error(res.data.message);
     }).catch((error) => console.log(error)).finally(() => setLoading(false));
-  };
+  }
+
+  const getCart = async () => {
+    setLoading(true);
+    if (!state.isAuthenticated) return;
+    else {
+      return await ApiService.get("Order/get-order-by-user");
+    }
+  }
 
   const getProductImages = async () => {
     await axiosInstance.get(`ProductImage/images/${selectedProduct?.productID}`).then((res) => {
-      if (res.data.success) {
+      if (res.data.success && res.data.data) {
         setImages(res.data?.data);
-        setImage(res.data?.data[0]?.imageURL || "https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg");
+        setImage(res.data?.data[0]?.imageURL);
       }
-      else toast.error(res.data.message);
     }).catch((error) => {
       console.log(error);
     });
@@ -107,7 +130,7 @@ const ProductDetails = ({ selectedProduct }) => {
             </div>
             <div className="detail py-3">
               <div className="d-flex align-items-center">
-                <ion-icon name="copy" color="secondary"></ion-icon>&nbsp;Chất liệu: 
+                <ion-icon name="copy" color="secondary"></ion-icon>&nbsp;Chất liệu:
                 <span>&nbsp;{selectedProduct?.material}</span>
               </div>
 
@@ -134,7 +157,7 @@ const ProductDetails = ({ selectedProduct }) => {
             <button
               className="addToCartBtn"
               type="submit"
-              onClick={() => handelAdd()}
+              onClick={handelAdd}
             >
               <span>Thêm vào giỏ hàng</span>
             </button>

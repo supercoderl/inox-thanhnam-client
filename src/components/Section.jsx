@@ -14,7 +14,7 @@ const Section = ({ title, bgColor, productItems, image }) => {
               null
           }
           <h2>{title}</h2>
-          <Link className="link">Xem thêm</Link>
+          <Link className="link" to={"shop"}>Xem thêm</Link>
         </div>
         <Row className="justify-content-center">
           {productItems.map((productItem) => {

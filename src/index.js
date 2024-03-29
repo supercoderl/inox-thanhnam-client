@@ -68,7 +68,7 @@ const AuthProvider = ({ children }) => {
 
   const logout = () => {
     dispatch({ type: 'LOGOUT' });
-    console.log(state);
+    window.location.replace("login");
   };
 
 
