@@ -16,7 +16,7 @@ function App() {
   const [connection, setConnection] = useState();
 
   const joinRoom = async (user, room) => {
-    const connection = new HubConnectionBuilder().withUrl("http://localhost:5112/notify").configureLogging(LogLevel.Information).build();
+    const connection = new HubConnectionBuilder().withUrl("https://inox.somee.com/notify").configureLogging(LogLevel.Information).build();
     await connection.start();
     await connection.invoke("JoinRoom", { user, room });
     setConnection(connection);
