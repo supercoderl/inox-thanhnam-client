@@ -10,9 +10,8 @@ import ApiService from "../services/apiService";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader/Loader";
 
-const Product = () => {
+const Product = ({ add, isDisable }) => {
   const { id } = useParams();
-  const [relatedProducts, setRelatedProducts] = useState([]);
   const [product, setProduct] = useState(null);
   const [products, setProducts] = useState([]);
 
@@ -46,13 +45,6 @@ const Product = () => {
     window.scrollTo(0, 0);
     getProductByID();
     getProducts();
-    // setRelatedProducts(
-    //   products.filter(
-    //     (item) =>
-    //       item.category === selectedProduct?.category &&
-    //       item.id !== selectedProduct?.id
-    //   )
-    // );
   }, [id]);
 
   useWindowScrollToTop();
@@ -61,13 +53,21 @@ const Product = () => {
     return (
       <Fragment>
         <Banner title={product?.name} />
-        <ProductDetails selectedProduct={product} />
+        <ProductDetails
+          selectedProduct={product}
+          add={() => add(product.productID)}
+          isDisable={isDisable}
+        />
         <ProductReviews selectedProduct={product} />
         <section className="related-products">
           <Container>
             <h3>Có thể bạn thích</h3>
           </Container>
-          <ShopList productItems={products.length > 0 ? shuffleArray(products).slice(0, 5) : ["asd"]} />
+          <ShopList
+            productItems={products.length > 0 ? shuffleArray(products).slice(0, 5) : ["asd"]}
+            add={add}
+            isDisable={isDisable}
+          />
         </section>
       </Fragment>
     );

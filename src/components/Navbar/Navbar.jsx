@@ -2,15 +2,9 @@ import { useState } from "react";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import "./navbar.css";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useAuth } from "../..";
-import AuthService from "../../services/authService";
-import { toast } from "react-toastify";
-const NavBar = () => {
-  const { cartList } = useSelector((state) => state.cart);
+const NavBar = ({ order }) => {
   const [expand, setExpand] = useState(false);
   const [isFixed, setIsFixed] = useState(false);
-  const { state, logout } = useAuth();
 
   // fixed Header
   function scrollHandler() {
@@ -22,15 +16,9 @@ const NavBar = () => {
   }
   window.addEventListener("scroll", scrollHandler);
 
-  const handleLogout = () => {
-    // await AuthService.logout().then((res) => {
-    //   if (res.data.success) {
-
-    //   } else toast.error(res.data.message);
-    // }).catch((error) => console.log(error));
-    localStorage.clear();
-    logout();
-  }
+  // const handleLogout = () => {
+  //   localStorage.clear();
+  // }
 
   return (
     <Navbar
@@ -50,7 +38,7 @@ const NavBar = () => {
         {/* Media cart and toggle */}
         <div className="d-flex">
           <div className="media-cart">
-            <Link
+            {/* <Link
               aria-label="Go to Login Page"
               to="/login"
               className="cart"
@@ -67,12 +55,12 @@ const NavBar = () => {
                   clipRule="evenodd"
                 />
               </svg>
-            </Link>
+            </Link> */}
             <Link
               aria-label="Go to Cart Page"
               to="/cart"
               className="cart"
-              data-num={cartList.length}
+              data-num={order?.productQuantity || 0}
             >
               <svg
                 fill="#000000"
@@ -107,7 +95,7 @@ const NavBar = () => {
                 aria-label="Go to Home Page"
                 className="navbar-link"
                 to="/"
-                onClick={() => setExpand(false)}
+                reloadDocument
               >
                 <span className="nav-link-label">Trang chủ</span>
               </Link>
@@ -118,7 +106,7 @@ const NavBar = () => {
                 aria-label="Go to Shop Page"
                 className="navbar-link"
                 to="/shop"
-                onClick={() => setExpand(false)}
+                reloadDocument
               >
                 <span className="nav-link-label">Sản phẩm</span>
               </Link>
@@ -129,56 +117,34 @@ const NavBar = () => {
                 aria-label="Go to Cart Page"
                 className="navbar-link"
                 to="/contact"
-                onClick={() => setExpand(false)}
+                reloadDocument
               >
                 <span className="nav-link-label">Liên hệ</span>
               </Link>
             </Nav.Item>
             <Nav.Item className="expanded-cart">
-              {
-                state.isAuthenticated ?
-                  <Link
-                    aria-label="Go to Login Page"
-                    onClick={handleLogout}
-                    className="login"
-                  >
-                    <svg
-                      width="20px"
-                      height="20px"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      className="nav-icon"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M13.5 7.5L10.5 10.75M13.5 7.5L10.5 4.5M13.5 7.5L4 7.5M8 13.5H1.5L1.5 1.5L8 1.5"
-                        stroke="#000000"
-                      />
-                    </svg>
-                  </Link>
-                  :
-                  <Link
-                    aria-label="Go to Login Page"
-                    to="/login"
-                    className="login"
-                  >
-                    <svg
-                      fill="#000000"
-                      width="24px"
-                      height="24px"
-                      viewBox="0 0 24 24"
-                      className="nav-icon"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M15.71,12.71a6,6,0,1,0-7.42,0,10,10,0,0,0-6.22,8.18,1,1,0,0,0,2,.22,8,8,0,0,1,15.9,0,1,1,0,0,0,1,.89h.11a1,1,0,0,0,.88-1.1A10,10,0,0,0,15.71,12.71ZM12,12a4,4,0,1,1,4-4A4,4,0,0,1,12,12Z" />
-                    </svg>
-                  </Link>
-              }
+              {/* <Link
+                aria-label="Go to Login Page"
+                to="/login"
+                className="login"
+              >
+                <svg
+                  fill="#000000"
+                  width="24px"
+                  height="24px"
+                  viewBox="0 0 24 24"
+                  className="nav-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M15.71,12.71a6,6,0,1,0-7.42,0,10,10,0,0,0-6.22,8.18,1,1,0,0,0,2,.22,8,8,0,0,1,15.9,0,1,1,0,0,0,1,.89h.11a1,1,0,0,0,.88-1.1A10,10,0,0,0,15.71,12.71ZM12,12a4,4,0,1,1,4-4A4,4,0,0,1,12,12Z" />
+                </svg>
+              </Link> */}
               <Link
                 aria-label="Go to Cart Page"
                 to="/cart"
+                reloadDocument
                 className="cart"
-                data-num={cartList.length}
+                data-num={order?.productQuantity || 0}
               >
                 <svg
                   fill="#000000"

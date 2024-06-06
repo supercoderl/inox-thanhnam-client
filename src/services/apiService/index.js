@@ -40,12 +40,25 @@ const ApiService = {
         return amount ? amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : 0;
     },
     splitFullname: (fullname) => {
-        if(!fullname || fullname === "") return null;
+        if (!fullname || fullname === "") return null;
         const splitName = fullname.split(' ');
         const firstname = splitName.pop();
         const lastname = splitName.join(' ');
         return { firstname, lastname };
-    }
+    },
+    setSession: (key, value) => {
+        const serializedValue = JSON.stringify(value);
+        window.sessionStorage.setItem(key, serializedValue);
+    },
+    getSession: (key) => {
+        try {
+            const item = window.sessionStorage.getItem(key);
+            return item ? JSON.parse(item) : null;
+        } catch (error) {
+            console.error(`Error getting sessionStorage item ${key}:`, error);
+            return null;
+        }
+    },
 };
 
 export default ApiService;

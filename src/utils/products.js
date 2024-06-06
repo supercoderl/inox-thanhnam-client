@@ -31,32 +31,33 @@ import wireless03 from "../Images/wireless-03.png";
 import wireless04 from "../Images/wireless-04.png";
 
 import sofaSlide from "../Images/cabinet.png";
-import watchSlide from "../Images/gun.png";
+
+import tableSlide from "../Images/table-01.png";
 
 export const SliderData = [
   {
       id: 1,
-      title: "50% Off For Your First Shopping",
-      desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quis lobortis consequat eu, quam etiam at quis ut convallis.",
+      title: "Chương trình khuyến mãi",
+      desc: "Tất cả các khách hàng mới sẽ được giảm giá ngay 10% trên tổng hóa đơn mua hàng. Đây là cơ hội tuyệt vời để bạn sở hữu những sản phẩm chất lượng với mức giá cực kỳ ưu đãi.",
       cover: sofaSlide,
   },
   {
       id: 2,
-      title: "50% Off For Your First Shopping",
-      desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quis lobortis consequat eu, quam etiam at quis ut convallis.",
+      title: "Quà tặng kèm 0 đồng",
+      desc: "Với mỗi đơn hàng trị giá từ 1 triệu đồng trở lên, quý khách sẽ nhận được một món quà tặng kèm là bộ dụng cụ nhà bếp tiện lợi, giúp việc nấu nướng trở nên dễ dàng và thú vị hơn.",
       cover: phone08,
   },
   {
       id: 3,
-      title: "50% Off For Your First Shopping",
-      desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quis lobortis consequat eu, quam etiam at quis ut convallis.",
+      title: "Bảo hành sản phẩm",
+      desc: "Mọi sản phẩm inox và đồ dân dụng tại cửa hàng đều được bảo hành chính hãng lên đến 12 tháng, đảm bảo chất lượng và sự hài lòng tuyệt đối cho quý khách.",
       cover: wireless01,
   },
   {
       id: 4,
-      title: "50% Off For Your First Shopping",
-      desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quis lobortis consequat eu, quam etiam at quis ut convallis.",
-      cover: watchSlide,
+      title: "Bộ dao kéo nhà bếp đa năng",
+      desc: "Bao gồm nhiều loại dao chuyên dụng phù hợp cho mọi nhu cầu nấu nướng, hiện cũng đang có chương trình khuyến mãi mua 1 tặng 1 trong suốt thời gian diễn ra chương trình.",
+      cover: tableSlide,
   },
 ];
 

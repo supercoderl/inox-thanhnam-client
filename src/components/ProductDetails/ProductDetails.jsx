@@ -1,63 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import { toast } from "react-toastify";
 import "./product-details.css";
 import ApiService from "../../services/apiService";
 import axiosInstance from "../../config/axios";
-import { useAuth } from "../..";
+import Loader from "../Loader/Loader";
 
-const ProductDetails = ({ selectedProduct }) => {
+const ProductDetails = ({ selectedProduct, add, isDisable, magnifierHeight = 100, magnifieWidth = 100, zoomLevel = 1.5 }) => {
   let scrl = useRef(null);
   const [scrollX, setscrollX] = useState(0);
   const [scrollEnd, setScrollEnd] = useState(false);
 
+  const [[x, y], setXY] = useState([0, 0]);
+  const [[imgWidth, imgHeight], setSize] = useState([0, 0]);
+  const [showMagnifier, setShowMagnifier] = useState(false);
+
   const [images, setImages] = useState([]);
   const [image, setImage] = useState("https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg");
-  const [loading, setLoading] = useState(false);
-  const orderID = localStorage.getItem("OrderID");
-  const { state } = useAuth();
-
-  const handelAdd = async () => {
-    if (!state.isAuthenticated) {
-      toast.warning("Bạn phải đăng nhập để tiếp tục.");
-      return;
-    }
-    else if (!orderID) {
-      await getCart().then(async (response) => {
-        const result = response.data;
-        console.log(result);
-        if (!result) return;
-        else if (result.success) {
-          localStorage.setItem("OrderID", result.data.orderID);
-          await add(result.data.orderID);
-        }
-        else toast.error(result.message);
-      }).catch((error) => console.log(error));
-    }
-    else await add(orderID);
-  };
-
-  const add = async (ordID) => {
-    setLoading(true);
-    const body = {
-      orderID: ordID,
-      productID: selectedProduct?.productID,
-      quantity: 1
-    };
-
-    await ApiService.post("Order/create-order-item", body, null).then((res) => {
-      if (res.data.success) toast.success(res.data.message);
-      else toast.error(res.data.message);
-    }).catch((error) => console.log(error)).finally(() => setLoading(false));
-  }
-
-  const getCart = async () => {
-    setLoading(true);
-    if (!state.isAuthenticated) return;
-    else {
-      return await ApiService.get("Order/get-order-by-user");
-    }
-  }
+  const [loading, setLoading] = useState(true);
 
   const getProductImages = async () => {
     await axiosInstance.get(`ProductImage/images/${selectedProduct?.productID}`).then((res) => {
@@ -67,7 +26,7 @@ const ProductDetails = ({ selectedProduct }) => {
       }
     }).catch((error) => {
       console.log(error);
-    });
+    }).finally(() => setTimeout(() => setLoading(false), 300));
   }
 
   const handleChangeImage = (image) => {
@@ -102,13 +61,71 @@ const ProductDetails = ({ selectedProduct }) => {
     getProductImages();
   }, []);
 
+  if (loading) {
+    return <Loader />
+  }
+
   return (
     <section className="product-page">
       <Container>
         <Row className="justify-content-center">
           <Col md={4}>
-            <div className="main-image-container">
-              <img loading="lazy" className="main-image" src={image} alt="" />
+            <div className="main-image-container position-relative">
+              <img
+                loading="lazy"
+                className="main-image"
+                src={image}
+                alt=""
+                onMouseEnter={(e) => {
+                  // update image size and turn-on magnifier
+                  const elem = e.currentTarget;
+                  const { width, height } = elem.getBoundingClientRect();
+                  setSize([width, height]);
+                  setShowMagnifier(true);
+                }}
+                onMouseMove={(e) => {
+                  // update cursor position
+                  const elem = e.currentTarget;
+                  const { top, left } = elem.getBoundingClientRect();
+
+                  // calculate cursor position on the image
+                  const x = e.pageX - left - window.pageXOffset;
+                  const y = e.pageY - top - window.pageYOffset;
+                  setXY([x, y]);
+                }}
+                onMouseLeave={() => {
+                  // close magnifier
+                  setShowMagnifier(false);
+                }}
+              />
+              <div
+                style={{
+                  display: showMagnifier ? "" : "none",
+                  position: "absolute",
+
+                  // prevent magnifier blocks the mousemove event of img
+                  pointerEvents: "none",
+                  // set size of magnifier
+                  height: `${magnifierHeight}px`,
+                  width: `${magnifieWidth}px`,
+                  // move element center to cursor pos
+                  top: `${y - magnifierHeight / 2}px`,
+                  left: `${x - magnifieWidth / 2}px`,
+                  opacity: "1", // reduce opacity so you can verify position
+                  border: "1px solid lightgray",
+                  backgroundColor: "white",
+                  backgroundImage: `url('${image}')`,
+                  backgroundRepeat: "no-repeat",
+
+                  //calculate zoomed image size
+                  backgroundSize: `${imgWidth * zoomLevel}px ${imgHeight * zoomLevel
+                    }px`,
+
+                  //calculate position of zoomed image.
+                  backgroundPositionX: `${-x * zoomLevel + magnifieWidth / 2}px`,
+                  backgroundPositionY: `${-y * zoomLevel + magnifierHeight / 2}px`
+                }}
+              ></div>
             </div>
           </Col>
           <Col md={7} className="d-flex flex-column jutify-content-between">
@@ -157,56 +174,59 @@ const ProductDetails = ({ selectedProduct }) => {
             <button
               className="addToCartBtn"
               type="submit"
-              onClick={handelAdd}
+              onClick={add}
+              disabled={isDisable || selectedProduct?.quantity === 0}
             >
-              <span>Thêm vào giỏ hàng</span>
+              <span>{selectedProduct?.quantity === 0 ? "Hết hàng" : "Thêm vào giỏ hàng"}</span>
             </button>
           </Col>
         </Row>
         <Row className="mt-3 justify-content-center">
           <Col md={4}>
             <div className="d-flex images-container">
-              <button className="slider-previous" onClick={() => slide(-100)}>
-                <svg
-                  fill="#000000"
-                  width="20px"
-                  height="20px"
-                  viewBox="-78.5 0 512 512"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <title>{"left"}</title>
-                  <path d="M257 64L291 98 128 262 291 426 257 460 61 262 257 64Z" />
-                </svg>
-              </button>
-              <div className="d-flex images-col" ref={scrl} onScroll={scrollCheck}>
-                {
-                  images && images.length > 0 ?
-                    images.map((item, index) => (
-                      <img
-                        key={index}
-                        loading="lazy"
-                        className="image-item"
-                        src={item?.imageURL}
-                        alt=""
-                        onClick={() => handleChangeImage(item)}
-                      />
-                    ))
-                    :
-                    null
-                }
-              </div>
-              <button className="slider-next" onClick={() => slide(+100)}>
-                <svg
-                  fill="#000000"
-                  width="20px"
-                  height="20px"
-                  viewBox="-77 0 512 512"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <title>{"right"}</title>
-                  <path d="M98 460L64 426 227 262 64 98 98 64 294 262 98 460Z" />
-                </svg>
-              </button>
+              {
+                images && images.length > 0 &&
+                <>
+                  <button className="slider-previous" onClick={() => slide(-100)}>
+                    <svg
+                      fill="#000000"
+                      width="20px"
+                      height="20px"
+                      viewBox="-78.5 0 512 512"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <title>{"left"}</title>
+                      <path d="M257 64L291 98 128 262 291 426 257 460 61 262 257 64Z" />
+                    </svg>
+                  </button>
+                  <div className="d-flex images-col" ref={scrl} onScroll={scrollCheck}>
+                    {
+                      images.map((item, index) => (
+                        <img
+                          key={index}
+                          loading="lazy"
+                          className="image-item"
+                          src={item?.imageURL}
+                          alt=""
+                          onClick={() => handleChangeImage(item)}
+                        />
+                      ))
+                    }
+                  </div>
+                  <button className="slider-next" onClick={() => slide(+100)}>
+                    <svg
+                      fill="#000000"
+                      width="20px"
+                      height="20px"
+                      viewBox="-77 0 512 512"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <title>{"right"}</title>
+                      <path d="M98 460L64 426 227 262 64 98 98 64 294 262 98 460Z" />
+                    </svg>
+                  </button>
+                </>
+              }
             </div>
           </Col>
           <Col md={7}></Col>

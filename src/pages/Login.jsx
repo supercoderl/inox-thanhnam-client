@@ -2,9 +2,7 @@ import { useEffect, useState } from "react"
 import AuthService from "../services/authService";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
-import Spinner from "../components/Spinner/Spinner";
 import ApiService from "../services/apiService";
-import { useAuth } from "..";
 import { v4 as uuid } from 'uuid';
 import axiosInstance from "../config/axios";
 import Loading from "../components/Loading";
@@ -15,7 +13,6 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const route = useLocation();
-    const { login } = useAuth();
 
     const [loginRequest, setLoginRequest] = useState({
         username: null,
@@ -45,9 +42,6 @@ function Login() {
                 AuthService.saveAccessToken(res.data.data?.token?.accessToken);
                 AuthService.saveRefreshToken(res.data.data?.refreshToken?.refreshToken);
                 AuthService.saveUser(JSON.stringify(res.data.data?.userResult));
-                login(JSON.stringify(res.data.data?.userResult));
-                localStorage.setItem("authState", JSON.stringify({ isAuthenticated: true, payload: JSON.stringify(res.data.data?.userResult) }));
-                await checkOrder();
                 navigate("/");
             }
             else toast.error(res.data.message);
@@ -78,16 +72,7 @@ function Login() {
         }).catch((error) => console.log("Register: ", error)).finally(() => setTimeout(() => setLoading(false), 2000));
     }
 
-    const checkOrder = async () => {
-        await axiosInstance.get("Order/get-order-by-user").then((response) => {
-            const result = response.data;
-            if (!result) return;
-            else if (result.success) localStorage.setItem("OrderID", result.data?.orderID);
-        }).catch((error) => console.log("Get order: ", error));
-    }
-
     useEffect(() => {
-        console.log(route);
         if (route && route.state) setState(route.state);
     }, []);
 

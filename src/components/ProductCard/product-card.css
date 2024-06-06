@@ -30,11 +30,12 @@
     border-radius: 8px;
     box-shadow: rgb(3 0 71 / 9%) 0px 1px 3px;
     margin: 10px;
+    overflow: hidden;
 }
 
 .product h3 {
     height: 40px;
-    margin: 10px 0;
+    margin: 1rem 0;
     font-weight: 500;
     font-size: 17px;
     cursor: pointer;
@@ -82,6 +83,12 @@ button.add {
     border-radius: 50%;
 }
 
+button.add:disabled,
+.price button:disabled:hover {
+    background: #0000001c;
+    color: #0000002b;
+}
+
 .product-like {
     position: absolute;
     top: 0;
@@ -107,4 +114,12 @@ button.add {
 
 .product:hover .product-like {
     opacity: 1;
+}
+
+.out-stock {
+    border: 1px solid #0000001b;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+    color: #00000082;
 }

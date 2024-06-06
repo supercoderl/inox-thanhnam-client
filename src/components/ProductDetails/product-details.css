@@ -62,6 +62,11 @@
   left: 100%;
 }
 
+.addToCartBtn:disabled {
+  background-color: #0000001c;
+  color: rgba(0, 0, 0, 0.289);
+}
+
 @media (max-width: 767px) {
   .product-page .row {
     gap: 30px;

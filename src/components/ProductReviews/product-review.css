@@ -27,3 +27,264 @@
   color: #ffcd4e;
   font-weight: 500;
 }
+
+.comment-img {
+  display: inline-block;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.comment-replies .comment-img {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.comment a,
+.comment-replies a {
+  text-decoration: none !important;
+}
+
+.sort-btn.btn-secondary,
+.comment .btn-secondary,
+.comment-replies .btn-secondary {
+  --bs-btn-box-shadow: none;
+  --bs-btn-focus-box-shadow: none;
+  --bs-btn-hover-shadow: none;
+  --bs-btn-active-shadow: none;
+  --bs-btn-border-color: transparent;
+  --bs-btn-focus-border-color: transparent;
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-color: var(--bs-body);
+  --bs-btn-hover-color: var(--bs-body);
+  --bs-btn-active-color: var(--bs-body);
+  --bs-btn-bg: transparent;
+  --bs-btn-hover-bg: rgba(var(--bs-secondary-rgb), .075);
+  --bs-btn-active-bg: rgba(var(--bs-secondary-rgb), .15);
+}
+
+.comment .btn-primary,
+.comment-replies .btn-primary {
+  --bs-btn-box-shadow: none;
+  --bs-btn-focus-box-shadow: none;
+  --bs-btn-hover-shadow: none;
+  --bs-btn-active-shadow: none;
+  --bs-btn-border-color: transparent;
+  --bs-btn-focus-border-color: transparent;
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-color: var(--bs-primary);
+  --bs-btn-hover-color: var(--bs-primary);
+  --bs-btn-active-color: var(--bs-primary);
+  --bs-btn-bg: transparent;
+  --bs-btn-hover-bg: rgba(var(--bs-primary-rgb), .075);
+  --bs-btn-active-bg: rgba(var(--bs-primary-rgb), .15);
+}
+
+.comment .btn-danger,
+.comment-replies .btn-danger {
+  --bs-btn-box-shadow: none;
+  --bs-btn-focus-box-shadow: none;
+  --bs-btn-hover-shadow: none;
+  --bs-btn-active-shadow: none;
+  --bs-btn-border-color: transparent;
+  --bs-btn-focus-border-color: transparent;
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-color: var(--bs-danger);
+  --bs-btn-hover-color: var(--bs-danger);
+  --bs-btn-active-color: var(--bs-danger);
+  --bs-btn-bg: transparent;
+  --bs-btn-hover-bg: rgba(var(--bs-danger-rgb), .075);
+  --bs-btn-active-bg: rgba(var(--bs-danger-rgb), .15);
+}
+
+.form-floating.comment-compose>.form-control,
+.form-floating.comment-compose>.form-control:focus {
+  border: 0;
+  box-shadow: none;
+  background-color: transparent;
+  border-bottom: 2px var(--bs-border-style) var(--bs-body-color);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  padding: 1rem 0.15rem 0.5rem;
+}
+
+.form-floating.comment-compose>.form-control:not(:-moz-placeholder-shown)~label::after {
+  color: var(--bs-secondary-color);
+  background-color: transparent;
+  padding: 0;
+  line-height: 1;
+}
+
+.form-floating.comment-compose>.form-control:not(:-ms-input-placeholder)~label::after {
+  color: var(--bs-secondary-color);
+  background-color: transparent;
+  padding: 0;
+  line-height: 1;
+}
+
+.form-floating.comment-compose>label,
+.form-floating.comment-compose>.form-control:focus~label::after,
+.form-floating.comment-compose>.form-control:not(:placeholder-shown)~label::after {
+  color: var(--bs-secondary-color);
+  background-color: transparent;
+  padding: 0;
+  line-height: 1;
+}
+
+.comment .btn[data-bs-toggle=collapse][aria-expanded=true] .chevron-down,
+.comment .btn[data-bs-toggle=collapse][aria-expanded=false] .chevron-up {
+  display: none;
+}
+
+/* ----- testing ----- */
+:root,
+[data-bs-theme=light] {
+  --sk-icon-size: 0.75em;
+  --sk-icon-btn-color: inherit;
+  --sk-icon-btn-size: 1.5rem;
+  --sk-icon-btn-padding: 0.5rem;
+  --sk-icon-btn-hover-color: inherit;
+  --sk-icon-btn-hover-bg: currentcolor;
+  --sk-icon-btn-active-color: inherit;
+  --sk-icon-btn-active-bg: currentcolor;
+}
+
+.ski,
+.svg-icon,
+.icon-btn svg,
+.icon-btn-base svg,
+.icon-btn img,
+.icon-btn-base img {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--sk-icon-size);
+  height: var(--sk-icon-size);
+  fill: currentcolor;
+}
+
+.icon-btn,
+.icon-btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: var(--sk-icon-btn-size);
+  height: var(--sk-icon-btn-size);
+  font-size: var(--sk-icon-btn-size);
+  line-height: 1;
+  padding: var(--sk-icon-btn-padding);
+  box-sizing: content-box;
+  aspect-ratio: 1/1;
+}
+
+.ski::before {
+  font-size: var(--sk-icon-size);
+}
+
+.icon-btn {
+  color: var(--sk-icon-btn-color);
+  background-color: transparent;
+  border-radius: 50%;
+  border: 0;
+  outline: solid 1px transparent;
+}
+
+.icon-btn:hover {
+  color: var(--sk-icon-btn-hover-color);
+  background-color: rgba(0, 0, 0, 0.1);
+  background-color: color-mix(in srgb, var(--sk-icon-btn-hover-bg) 10%, transparent);
+}
+
+.icon-btn:hover:active {
+  color: var(--sk-icon-btn-active-color);
+  background-color: rgba(0, 0, 0, 0.2);
+  outline-color: rgba(0, 0, 0, 0.4);
+  background-color: color-mix(in srgb, var(--sk-icon-btn-active-bg) 20%, transparent);
+  outline-color: color-mix(in srgb, var(--sk-icon-btn-active-bg) 40%, transparent);
+}
+
+.header {
+  padding: 20px 10px;
+  position: relative;
+  margin-bottom: 10px;
+
+}
+
+.header:after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: #eee;
+  position: absolute;
+  left: 30%;
+  right: 30%;
+}
+
+.header h2 {
+  font-size: 2em;
+  font-weight: 500;
+  margin-bottom: 0.5em;
+}
+
+.header p {
+  font-size: 14px;
+}
+
+#a-footer {
+  margin: 20px 0;
+}
+
+.new-react-version {
+  padding: 20px 20px;
+  border: 1px solid #eee;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.new-react-version .react-svg-logo {
+  text-align: center;
+  max-width: 60px;
+  margin: 20px auto;
+  margin-top: 0;
+}
+
+.rating-widget {
+  padding-bottom: 2rem;
+}
+
+.rating-stars ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.rating-stars ul>li.star {
+  display: inline-block;
+}
+
+.rating-stars ul>li.star>i.fa {
+  font-size: 2.5em;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.rating-stars ul>li.star.hover>i.fa {
+  color: #FFCC36;
+}
+
+.rating-stars ul>li.star.selected>i.fa {
+  color: #FF912C;
+}
+
+@media (max-width: 767px) {
+  .input-container {
+    flex-direction: column;
+  }
+}

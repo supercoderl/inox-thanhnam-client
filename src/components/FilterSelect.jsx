@@ -1,18 +1,11 @@
 import Select from 'react-select';
-import { products } from '../utils/products';
-
-const options = [
-    { value: "sofa", label: "Sofa" },
-    { value: "chair", label: "Chair" },
-    { value: "watch", label: "Watch" },
-    { value: "mobile", label: "Mobile" },
-    { value: "wireless", label: "Wireless" },
-];
+import { useEffect, useState } from 'react';
+import ApiService from '../services/apiService';
 
 const customStyles = {
     control: (provided) => ({
         ...provided,
-        backgroundColor: "#bd654f",
+        backgroundColor: "#d05a3ccf",
         color: "white",
         borderRadius: "5px",
         border: "none",
@@ -22,10 +15,10 @@ const customStyles = {
     }),
     option: (provided, state) => ({
         ...provided,
-        backgroundColor: state.isSelected ? "#0f3460" : "white",
-        color: state.isSelected ? "white" : "#0f3460",
+        backgroundColor: state.isSelected ? "#d05a3ccf" : "white",
+        color: state.isSelected ? "white" : "#d05a3ccf",
         "&:hover": {
-            backgroundColor: "#0f3460",
+            backgroundColor: "#d05a3ccf",
             color: "white",
         },
     }),
@@ -35,13 +28,37 @@ const customStyles = {
     }),
 };
 
-const FilterSelect = ({ setFilterList }) => {
-    const handleChange = (selectedOption) => {
-        setFilterList(products.filter(item => item.category === selectedOption.value))
+const FilterSelect = ({ handleChange }) => {
+
+    const [categories, setCategories] = useState([
+        {
+            value: -1,
+            label: "Tất cả"
+        }
+    ]);
+
+    const getCategories = async () => {
+        await ApiService.get("Category/categories").then((res) => {
+            const result = res.data;
+            if (!result) return;
+            else if (result.success && result.data && result.data.length > 0) {
+                setCategories((prevCategories => [...prevCategories, ...result.data.map((c) => {
+                    return {
+                        value: c.categoryID,
+                        label: c.name
+                    };
+                })]));
+            }
+        })
     }
+
+    useEffect(() => {
+        getCategories();
+    }, []);
+
     return (
         <Select
-            options={options}
+            options={categories}
             defaultValue={{ value: "", label: "Lọc sản phẩm" }}
             styles={customStyles}
             onChange={handleChange}
