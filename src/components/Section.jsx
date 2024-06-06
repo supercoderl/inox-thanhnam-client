@@ -2,7 +2,7 @@ import { Container, Row } from "react-bootstrap";
 import ProductCard from "./ProductCard/ProductCard";
 import { Link } from "react-router-dom";
 
-const Section = ({ title, bgColor, productItems, image }) => {
+const Section = ({ title, bgColor, productItems, image, add, isDisable }) => {
   return (
     <section style={{ background: bgColor }}>
       <Container fluid>
@@ -23,6 +23,8 @@ const Section = ({ title, bgColor, productItems, image }) => {
                 key={productItem.productID}
                 title={title}
                 productItem={productItem}
+                add={() => add(productItem.productID)}
+                isDisable={isDisable}
               />
             );
           })}

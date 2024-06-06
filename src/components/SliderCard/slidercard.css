@@ -43,3 +43,55 @@
     max-height: 300px;
     object-fit: contain;
 }
+
+.btn-slider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    text-decoration: none;
+    color: #ff0000;
+    font-size: 17px;
+    border-radius: 5px;
+    width: 160px;
+    padding-block: 0.75rem;
+    border: 1px solid #ff0000;
+    position: relative;
+    transition: 0.3s;
+    background-color: #ffffff;
+    font-weight: 600;
+}
+
+.btn-slider::before {
+    content: "SALE";
+    display: block;
+    font-size: 13px;
+    background-color: #ff0000;
+    color: #fff;
+    border-radius: 3px;
+    padding: 3px 5px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(-5px, -30%);
+    transition: .3s;
+}
+
+.btn-slider:hover::before {
+    transform: translate(-5px, -50%);
+}
+
+@media (max-width: 767px) {
+    .homeSlide .box {
+        margin: 0;
+        padding: 0;
+    }
+
+    .homeSlide h1 {
+        margin: 0;
+    }
+
+    .homeSlide .col-md-6 {
+        padding: 1rem;
+    }
+}

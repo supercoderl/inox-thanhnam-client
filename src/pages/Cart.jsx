@@ -1,72 +1,37 @@
 import { useEffect, useState } from "react";
-import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 import ApiService from "../services/apiService";
 import { toast } from "react-toastify";
-import { useAuth } from "..";
-import { useNavigate } from "react-router-dom";
-import AuthService from "../services/authService";
-import LoginRequire from "../components/Error/loginRequire";
-import axiosInstance from "../config/axios";
+import Loader from "../components/Loader/Loader";
+import { Form, Formik } from "formik";
+import * as Yup from "yup";
 
-const Cart = ({ connection }) => {
-  const [loading, setLoading] = useState(false);
-  const [order, setOrder] = useState(null);
+const CartSchema = Yup.object().shape({
+  fullname: Yup.string().required('Vui lòng nhập tên của bạn'),
+  phone: Yup.string().max(11, "Vui lòng nhập đúng số điện thoại").required('Vui lòng nhập số điện thoại'),
+  address: Yup.string().required("Vui lòng điền địa chỉ")
+});
+
+const Cart = ({ connection, getOrder }) => {
+  const order = ApiService.getSession("order");
+
+  const [loading, setLoading] = useState(true);
   const [orderItems, setOrderItems] = useState([]);
-  const [productDetails, setProductDetails] = useState([]);
-  const { state } = useAuth();
-  const navigate = useNavigate();
-  const user = JSON.parse(AuthService.getUser());
-  const [information, setInformation] = useState({
-    fullname: user?.fullname || "",
-    phone: user?.phone || "",
-    address: user?.address || ""
-  });
+  // const user = JSON.parse(AuthService.getUser());
 
-  const getCart = async () => {
-    setLoading(true);
-    if (!state.isAuthenticated) return;
-    else {
-      await ApiService.get("Order/get-order-by-user").then(async (res) => {
-        if (res.data.success) {
-          setOrder(res.data.data);
-          getCartItems(res.data.data?.orderID);
+  const getCartItems = async () => {
+    if (order) {
+      await ApiService.get(`Order/get-order-item/${order?.orderID}`).then((res) => {
+        const result = res.data;
+        if (!result) return;
+        else if (result.data) {
+          setOrderItems(result.data);
         }
-      }).catch((error) => {
-        console.log(error);
-      }).finally(() => setLoading(false));
+      }).catch((error) => console.log(error)).finally(() => setTimeout(() => setLoading(false), 300));
     }
   }
 
-  const getCartItems = async (orderID) => {
-    await ApiService.get(`Order/get-order-item/${orderID}`).then((res) => {
-      if (res.data.success) {
-        if (res.data.data && res.data.data.length > 0) {
-          setOrderItems(res.data.data);
-          res.data.data.forEach(async (item) => {
-            try {
-              const productDetail = await getProductByID(item.productID);
-              if (!productDetails.some(product => product.productID === productDetail.data.data.productID)) {
-                setProductDetails(prevState => [...prevState, productDetail.data.data]);
-              }
-            } catch (error) {
-              console.error("Error fetching product details:", error);
-            }
-          });
-        }
-      }
-      else toast.warning(res.data.message);
-    }).catch((error) => console.log(error));
-  }
-
-  const getProductByID = async (productID) => {
-    return await ApiService.get(`Product/get-product-by-id/${productID}`);
-  }
-
-  const getOrderItem = (productID) => {
-    return orderItems.find(x => x.productID === productID);
-  }
-
-  const updateQuantity = async (orderItem, product, quantity) => {
+  const updateQuantity = async (orderItem, quantity) => {
     if (quantity <= 0) {
       quantity += 1;
       toast.warning("Bạn không thể giảm số lượng về 0.");
@@ -75,68 +40,39 @@ const Cart = ({ connection }) => {
 
     orderItem.quantity = quantity;
 
-    await ApiService.post(`Order/create-order-item`, orderItem, null).then((res) => {
-      console.log(res);
-      if (res.data.success) {
-        getCart();
+    await ApiService.put(`Order/update-order-item/${orderItem?.orderItemID}`, orderItem, null).then((res) => {
+      const result = res.data;
+      if (!result) return;
+      else if (result.success) {
+        getCartItems();
+        getOrder();
       }
-      else toast.error(res.data.message);
+      else toast.error(result.message);
     }).catch((error) => console.log(error));
   }
 
   const deleteOrderItem = async (orderItem) => {
     await ApiService.delete(`Order/delete-order-item/${orderItem?.orderItemID}`).then((res) => {
       if (res.data.success) {
-        setProductDetails(productDetails.filter(x => x.productID !== orderItem?.productID));
         // toast.success(res.data.message);
-        getCartItems(localStorage.getItem("OrderID"));
-        getCart();
+        getCartItems();
+        getOrder();
       }
       else toast.error(res.data.message);
     }).catch((error) => console.log(error));
   }
 
-  const handleCheckout = async (e) => {
-    e.preventDefault();
-    if (!state.isAuthenticated) {
-      toast.warning("Bạn phải đăng nhập để tiếp tục.");
-      return;
-    }
-    const body = {
-      orderID: order.orderID,
-      userID: order.userID,
-      orderDate: new Date(),
-      totalAmount: order.totalAmount,
-      status: 1,
-      fullname: information.fullname,
-      phone: information.phone,
-      address: information.address
-    };
-    await axiosInstance.put(`Order/update-order/${order.orderID}`, body, null).then(async (response) => {
-      const result = response.data;
-      if (!result) return;
-      else if (result.success) {
-        toast.success("Đặt hàng thành công.");
-        getCart();
-        setInformation({});
-        localStorage.removeItem("OrderID");
-        await connection.invoke("SendNotify", `Bạn có đơn hàng mới! Mã đơn hàng ${result.data?.orderID}`, "order", result.data?.orderID);
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-      }
-      else toast.error(result.message);
-    }).catch((error) => console.log(error));
-  }
+  useEffect(() => {
+    getCartItems();
+  }, [order]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    // if(CartItem.length ===0) {
-    //   const storedCart = localStorage.getItem("cartItem");
-    //   setCartItem(JSON.parse(storedCart));
-    // }
-    getCart();
   }, []);
+
+  if (loading) {
+    return <Loader />
+  }
 
   return (
     <>
@@ -144,41 +80,36 @@ const Cart = ({ connection }) => {
         <Container>
           <Row className="justify-content-center">
             <Col md={8}>
-              {
-                !state.isAuthenticated && (
-                  <LoginRequire />
-                )
-              }
-              {state.isAuthenticated && productDetails.length === 0 && (
+              {orderItems.length === 0 && (
                 <h1 className="no-items product">Không có sản phẩm nào trong giỏ hàng</h1>
               )}
-              {state.isAuthenticated && productDetails.map((item) => {
-                const productQty = item.price * (getOrderItem(item.productID)?.quantity || 0);
+              {orderItems.map((item) => {
+                const productQty = item?.product.price * (item?.quantity || 0);
                 return (
-                  <div className="cart-list" key={item.productID}>
+                  <div className="cart-list" key={item.orderItemID}>
                     <Row>
                       <Col className="image-holder" sm={4} md={3}>
-                        <img src={item.imgUrl || "https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg"} alt="" />
+                        <img src={item?.imgUrl || "https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg"} alt="" />
                       </Col>
                       <Col sm={8} md={9}>
                         <Row className="cart-content justify-content-center">
                           <Col xs={12} sm={9} className="cart-details">
-                            <h3>{item.name || "N/A"}</h3>
+                            <h3>{item?.product?.name || "N/A"}</h3>
                             <h4>
-                              {ApiService.formatVND(item.price)} * {getOrderItem(item.productID)?.quantity}
+                              {ApiService.formatVND(item?.product?.price)} * {item?.quantity}
                               <span>{ApiService.formatVND(productQty)}</span>
                             </h4>
                           </Col>
                           <Col xs={12} sm={3} className="cartControl">
                             <button
                               className="incCart"
-                              onClick={() => updateQuantity(getOrderItem(item.productID), item, getOrderItem(item.productID)?.quantity + 1)}
+                              onClick={() => updateQuantity(item, item?.quantity + 1)}
                             >
                               <i className="fa-solid fa-plus"></i>
                             </button>
                             <button
                               className="desCart"
-                              onClick={() => updateQuantity(getOrderItem(item.productID), item, getOrderItem(item.productID)?.quantity - 1)}
+                              onClick={() => updateQuantity(item, item?.quantity - 1)}
                             >
                               <i className="fa-solid fa-minus"></i>
                             </button>
@@ -187,7 +118,7 @@ const Cart = ({ connection }) => {
                       </Col>
                       <button
                         className="delete"
-                        onClick={() => deleteOrderItem(getOrderItem(item.productID))}
+                        onClick={() => deleteOrderItem(item)}
                       >
                         <ion-icon name="close"></ion-icon>
                       </button>
@@ -207,42 +138,95 @@ const Cart = ({ connection }) => {
 
               <div className="cart-information">
                 <h2>Thông tin đặt hàng</h2>
-                <form onSubmit={handleCheckout}>
-                  <p>
-                    <label htmlFor="fullname" className="floatLabel">Họ và tên</label>
-                    <input
-                      id="fullname"
-                      name="fullname"
-                      type="text"
-                      value={information?.fullname}
-                      onChange={(e) => setInformation({ ...information, fullname: e.target.value })}
-                    />
-                  </p>
-                  <p>
-                    <label htmlFor="phone" className="floatLabel">Số điện thoại</label>
-                    <input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={information?.phone}
-                      onChange={(e) => setInformation({ ...information, phone: e.target.value })}
-                    />
-                  </p>
-                  <p>
-                    <label htmlFor="address" className="floatLabel">Địa chỉ</label>
-                    <textarea
-                      id="address"
-                      name="address"
-                      rows={4}
-                      className="w-100"
-                      value={information?.address}
-                      onChange={(e) => setInformation({ ...information, address: e.target.value })}
-                    />
-                  </p>
-                  <p>
-                    <input type="submit" value="Tiến hành đặt hàng" id="submit" />
-                  </p>
-                </form>
+                <Formik
+                  initialValues={{
+                    fullname: "",
+                    phone: "",
+                    address: ""
+                  }}
+                  validationSchema={CartSchema}
+                  onSubmit={async (values) => {
+                    if (!orderItems || orderItems.length <= 0) {
+                      toast.error("Giỏ hàng trống, bạn không thể thực hiện thanh toán!");
+                      return;
+                    }
+
+                    const body = {
+                      orderID: order.orderID,
+                      userID: order.userID,
+                      orderDate: new Date(),
+                      totalAmount: order.totalAmount,
+                      productQuantity: order.productQuantity,
+                      status: 1,
+                      fullname: values.fullname,
+                      phone: values.phone,
+                      address: values.address
+                    };
+                    await ApiService.put(`Order/update-order/${order.orderID}`, body, { isCheckout: true }).then(async (response) => {
+                      const result = response.data;
+                      if (!result) return;
+                      else if (result.success) {
+                        await connection.invoke("SendNotify", `Bạn có đơn hàng mới! Mã đơn hàng ${result.data?.orderID}`, "order", result.data?.orderID);
+                        window.location.href = "/order/succeed"
+                      }
+                      else toast.error(result.message);
+                    }).catch((error) => window.location.href = "/order/failed");
+                  }}
+                >
+                  {({ errors, touched, handleChange, values }) => (
+                    <Form>
+                      <p>
+                        <label htmlFor="fullname" className="floatLabel">Họ và tên</label>
+                        <input
+                          id="fullname"
+                          name="fullname"
+                          type="text"
+                          value={values.fullname}
+                          onChange={handleChange}
+                        />
+                        {touched.fullname && errors.fullname && (
+                          <span className="text-error">
+                            {errors.fullname}
+                          </span>
+                        )}
+                      </p>
+                      <p>
+                        <label htmlFor="phone" className="floatLabel">Số điện thoại</label>
+                        <input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          value={values.phone}
+                          onChange={handleChange}
+                        />
+                        {touched.phone && errors.phone && (
+                          <span className="text-error">
+                            {errors.phone}
+                          </span>
+                        )}
+                      </p>
+                      <p>
+                        <label htmlFor="address" className="floatLabel">Địa chỉ</label>
+                        <textarea
+                          id="address"
+                          name="address"
+                          rows={4}
+                          className="w-100"
+                          value={values.address}
+                          onChange={handleChange}
+                        />
+                        {touched.address && errors.address && (
+                          <span className="text-error">
+                            {errors.address}
+                          </span>
+                        )}
+                      </p>
+                      <p>
+                        <button type="submit" id="submit">Tiến hành đặt hàng</button>
+                      </p>
+                    </Form>
+                  )}
+                </Formik>
               </div>
             </Col>
           </Row>

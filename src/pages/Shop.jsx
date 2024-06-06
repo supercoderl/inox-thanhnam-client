@@ -8,15 +8,14 @@ import useWindowScrollToTop from "../hooks/useWindowScrollToTop";
 import ApiService from "../services/apiService";
 import { toast } from "react-toastify";
 
-const Shop = () => {
+const Shop = ({ add, isDisable }) => {
   const [products, setProducts] = useState([]);
-
   const [filterList, setFilterList] = useState(products);
 
   useWindowScrollToTop();
 
-  const getProducts = async () => {
-    await ApiService.get("Product/products").then((res) => {
+  const getProducts = async (categoryID = -1, searchText = "") => {
+    await ApiService.get("Product/products", { categoryID, searchText }).then((res) => {
       if (res.data.success) {
         setProducts(res.data.data);
         setFilterList(res.data.data);
@@ -38,15 +37,19 @@ const Shop = () => {
         <Container className="filter-bar-contianer mb-3">
           <Row className="justify-content-center">
             <Col md={4}>
-              <FilterSelect setFilterList={setFilterList} />
+              <FilterSelect handleChange={(e) => getProducts(e.value, "")} />
             </Col>
             <Col md={8}>
-              <SearchBar setFilterList={setFilterList} />
+              <SearchBar handleChange={(e) => getProducts(-1, e.target.value)} />
             </Col>
           </Row>
         </Container>
         <Container>
-          <ShopList productItems={filterList} />
+          <ShopList
+            productItems={filterList}
+            add={add}
+            isDisable={isDisable}
+          />
         </Container>
       </section>
     </Fragment>

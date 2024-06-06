@@ -7,13 +7,9 @@ import useWindowScrollToTop from "../hooks/useWindowScrollToTop";
 import ApiService from "../services/apiService";
 import { toast } from "react-toastify";
 
-const Home = () => {
+const Home = ({ add, isDisable }) => {
   const [products, setProducts] = useState([]);
 
-  const newArrivalData = products.filter(
-    (item) => item.category === "mobile" || item.category === "wireless"
-  );
-  const bestSales = products.filter((item) => item.category === "sofa");
   useWindowScrollToTop();
 
   const getProducts = async () => {
@@ -38,18 +34,24 @@ const Home = () => {
         image={require("../assets/images/icon/sale.gif")}
         bgColor="#f6f9fc"
         productItems={products.length > 0 ? products.filter(x => x.discountID).slice(0, 5) : products}
+        add={add}
+        isDisable={isDisable}
       />
       <Section
         title="Mới nhất"
         image="https://cdn-icons-gif.flaticon.com/12708/12708326.gif"
         bgColor="white"
         productItems={products.length > 0 ? products.slice(0, 5) : products}
+        add={add}
+        isDisable={isDisable}
       />
       <Section
-        title="Thương hiệu Thành Nam"
+        title="Thương hiệu"
         image={require("../assets/images/icon/trademark.gif")}
         bgColor="#f6f9fc"
         productItems={products.length > 0 ? products.slice(0, 5) : products}
+        add={add}
+        isDisable={isDisable}
       />
     </Fragment>
   );

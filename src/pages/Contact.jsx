@@ -119,7 +119,7 @@ const Contact = ({ connection }) => {
                                                     {
                                                         loading ? <Spinner size="0.75em" color="white" /> : null
                                                     }
-                                                    <span> SUBMIT</span>
+                                                    <span> Gửi đi</span>
                                                 </div>
                                             </button>
                                         </div>
@@ -127,7 +127,7 @@ const Contact = ({ connection }) => {
                                 </form>
                             </div>
                         </div>
-                        <div className="col-lg-12">
+                        {/* <div className="col-lg-12">
                             <div className="card mt-4 border-0 mb-4">
                                 <div className="row">
                                     <div className="col-lg-4 col-md-4">
@@ -189,7 +189,7 @@ const Contact = ({ connection }) => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
