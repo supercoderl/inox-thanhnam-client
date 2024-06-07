@@ -1,7 +1,7 @@
 # Inox Thành Nam
 
 ## 📌 Live Demo
-https://multimart-ecommerce.onrender.com
+https://inox-thanhnam-client.vercel.app/
 
 ## 😎 Features
 
@@ -14,10 +14,13 @@ https://multimart-ecommerce.onrender.com
 
 ## 🚀 What technologies were used?
 
-- react.js (create-react-app)
-- react-dom-router
-- react-bootstrap
-- state management using Redux Toolkit
+- Reactjs.
+- Bootstrap 5.
+- Fontawesome Icons
+- Microsoft SignalR
+- Axios For Fectching API
+- Lottie Animation
+- Toastify
 
 ## How can you clone and tweak this project?
 
@@ -25,13 +28,7 @@ From your command line, first clone this repo:
 
 ```
 # Clone this repository
-$ https://github.com/0mar-helal/multimart-react-ecommerce.git
-
-# Go into the repository
-$ cd multimart-react-ecommerce
-
-# Remove current origin repository
-$ git remote remove origin
+$ https://github.com/supercoderl/inox-thanhnam-client.git
 
 ```
 
